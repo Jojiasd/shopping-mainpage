@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search with Suggestions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        .search-container {
+            position: relative;
+            display: inline-block;
+            width: 80%;
+            max-width: 400px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .suggestions {
+            position: absolute;
+            width: 100%;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-top: none;
+            z-index: 1000;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .suggestion-item:hover {
+            background-color: #f1f1f1;
+        }
+        .product-list {
+            list-style: none;
+            padding: 0;
+            max-width: 400px;
+            margin: auto;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .product-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+         /* Banner Cards */
+    .banner-container {
+                    border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        margin: 20px 0;
+    }
+
+    .banner-slider {
+        display: flex;
+        transition: transform 1.2s ease; /* Extra Smooth */
+    }
+
+    .banner-card {
+      
+        min-width: 100%;
+        height: 385px; /* Mobile */
+        background:linear-gradient(135deg, #ccc, #888);
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    /* Responsive Banner Height */
+    @media (max-width: 768px) {
+        .banner-card {
+            height: 250px; /* Desktop */
+        }
+        .toggle{
+
+            border-right: 20px;
+            border-color: #201f1f;
+            border-top-right-radius: 2px; 
+        }
+        
+    }
+
+    /* Category Cards */
+    .category-container {
+        height:100%;
+        display: flex;
+        overflow-x: scroll;
+    
+        gap: 10px;
+        padding: 5px;
+    }
+
+    .category-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-card {
+        border-radius: 5p;
+        border: 3px solid #ccc;
+      
+        flex: 0 0 20%;
+        height: 100px;
+        background: linear-gradient(135deg, #ccc, #888);
+        color: white;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        text-align: center;
+    }
+    .container {
+       
+            height:100vh;
+            display: flex;
+            width: 100%;
+            transition: all 0.5s ease-in-out;
+        }
+        .toggle {
+            border: 5px;
+            border-color: #185c77;
+           
+            width: 25%;
+            height: 100vh;
+            background: #f4f4f4;
+            padding: 20px;
+            transition: width 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            overflow-y: auto;
+        }
+        .toggle h3 {
+            margin-bottom: 10px;
+        }
+        .toggle ul {
+            list-style: none;
+        }
+        .toggle ul li {
+            padding: 10px 0;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
+        .toggle ul li:hover {
+            color: #007bff;
+        }
+        .product-section {
+            width: 100%;
+            background: #ddd;
+            padding: 20px;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .offer-label {
+            margin-bottom: 5px;
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: red;
+            color: white;
+            padding: 8px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+        .product {
+            margin-top: 20px;
+            height: 20%;
+            width: 100%;
+            background: #ddd;
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overflow-x: auto;
+        }
+        .product::-webkit-scrollbar {
+            height: 2px;
+        }
+        .product::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        .product::-webkit-scrollbar-track {
+            background: #eee;
+        }
+        .card {
+            width: 97%;
+            background: white;
+            margin-left: 5px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 0 0 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .card img {
+            max-width: 50px;
+            display: block;
+            margin: 0 auto;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .product1-section {
+            width: 100%;
+            background: #ddd;
+            padding: 20px;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .product1 {
+            flex-direction: row;
+            margin-top: 20px;
+            height: 40%;
+            width: 100%;
+            background: #ddd;
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overflow-x: auto;
+        }
+        .product1::-webkit-scrollbar {
+            height: 2px;
+        }
+        .product1::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        .product1::-webkit-scrollbar-track {
+            background: #eee;
+        }
+        .card {
+            margin-left: 13px;
+            width: 45%;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 0 0 45%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .card1 img {
+            max-width: 98%;
+            display: block;
+            margin: 0 auto;
+        }
+        .card1:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 768px) {
+            .card{
+                height: 100%;
+            }
+        
+        .categort-card{ height: 10%;
+
+        }
+          
+            .container {
+                flex-direction: row;
+            }
+            .toggle {
+                
+                display: none;
+            }
+            .product {
+                width: 100%;
+            }
+           
+        }
+       
+    </style>
+</head>
+<body>
+
+    <h2>Search Products</h2>
+    <div class="search-container">
+        <input type="text" id="searchBox" class="search-box" placeholder="Search Products...">
+        <div id="suggestions" class="suggestions"></div>
+    </div>
+
+
+    <!-- Banner Cards with Ultra-Smooth Auto Scroll --><!-- Banner Cards -->
+<div class="banner-container">
+    <div class="banner-slider" id="banner-slider"></div>
+</div>
+
+<!-- Category Cards -->
+<div class="category-container" id="category-container"></div>
+
+
+<div class="container">
+    <div class="toggle">
+        <h3>Categories</h3>
+        <ul>
+            <li>Electronics</li>
+            <li>Home Appliances</li>
+            <li>Fashion</li>
+            <li>Books</li>
+            <li>Sports</li>
+        </ul>
+    </div>
+    <div class="product-section">
+        <div class="offer-label">Limited Time Offer!</div>
+       
+        <!-- Product 1 Section -->
+       
+        <div class="product" id="product1-container">
+            <!-- Dynamic Products 1 will be added here -->
+        </div>
+
+        <!-- Product 2 Section -->
+       
+        <div class="product" id="product2-container">
+            <!-- Dynamic Products 2 will be added here -->
+        </div>
+         <!-- Product 3 Section -->
+       
+         <div class="product1" class="card1" id="product3-container">
+            <!-- Dynamic Products 2 will be added here -->
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        const products = [
+        { id: 101, name: "Laptop", price: "$800", img: "https://via.placeholder.com/50?text=Laptop", bannerImg: "https://wallpapercave.com/wp/wp4810879.jpg", category: "Laptops" },
+    { id: 102, name: "Smartphone", price: "$500", img: "", bannerImg: "https://via.placeholder.com/800x300?text=Phone+Deal", category: "Smartphones" },
+    { id: 103, name: "Tablet", price: "$300", img: "https://via.placeholder.com/50?text=Tablet", bannerImg: "https://via.placeholder.com/800x300?text=Tablet+Deal", category: "Tablets" },
+    { id: 101, name: "Laptop", price: "$800", img: "https://via.placeholder.com/50?text=Laptop", bannerImg: "https://th.bing.com/th/id/OIP._esNjDv0doGQOoian-U12gHaEK?w=1920&h=1080&rs=1&pid=ImgDetMain", category: "home appliances" },
+    { id: 102, name: "Smartphone", price: "$500", img: "https://via.placeholder.com/50?text=Phone", bannerImg: "https://via.placeholder.com/800x300?text=Phone+Deal", category: "Smartphones" },
+    { id: 103, name: "Tablet", price: "$300", img: "https://via.placeholder.com/50?text=Tablet", bannerImg: "https://via.placeholder.com/800x300?text=Tablet+Deal", category: "Tablets" },
+    { id: 101, name: "Laptop", price: "$800", img: "https://via.placeholder.com/50?text=Laptop", bannerImg: "https://th.bing.com/th/id/OIP.Gv06UzfZgP7VWCTn57nvUQHaEK?rs=1&pid=ImgDetMain", category: "Laptops" },
+    { id: 102, name: "Smartphone", price: "$500", img: "https://via.placeholder.com/50?text=Phone", bannerImg: "https://th.bing.com/th/id/OIP.H6ROGWSeBf2zMTqSTZ8_gQHaDh?w=1024&h=488&rs=1&pid=ImgDetMain", category: "Smartphones" },
+    { id: 103, name: "Tablet", price: "$300", img: "", bannerImg: "", category: "Tablets" },
+    { id: 101, name: "Laptop", price: "$800", img: "https://via.placeholder.com/50?text=Laptop", bannerImg: "https://via.placeholder.com/800x300?text=Laptop+Deal", category: "Laptops" },
+    { id: 102, name: "Smartphone", price: "$500", img: "https://via.placeholder.com/50?text=Phone", bannerImg: "https://via.placeholder.com/800x300?text=Phone+Deal", category: "Smartphones" },
+    { id: 103, name: "Tablet", price: "$300", img: "https://via.placeholder.com/50?text=Tablet", bannerImg: "https://via.placeholder.com/800x300?text=Tablet+Deal", category: "Tablets" },
+
+            { id: 101, name: "Laptop", price: "$800", img: "https://via.placeholder.com/50?text=Laptop" },
+            { id: 102, name: "Smartphone", price: "$500", img: "" },
+            { id: 103, name: "Tablet", price: "$300", img: "https://via.placeholder.com/50?text=Tablet" },
+            { id: 104, name: "Headphones", price: "$100", img: "https://via.placeholder.com/50?text=Headphones" },
+            { id: 105, name: "Smartwatch", price: "$200", img: "https://via.placeholder.com/50?text=Watch" },
+            { id: 106, name: "Camera", price: "$700", img: "https://via.placeholder.com/50?text=Camera" }
+        ];
+        const bannerSlider = document.getElementById("banner-slider");
+const categoryContainer = document.getElementById("category-container");
+const product1Container = document.getElementById("product1-container");
+        const product2Container = document.getElementById("product2-container");
+        const product3Container = document.getElementById("product3-container");
+
+        const searchBox = document.getElementById("searchBox");
+        const suggestionsBox = document.getElementById("suggestions");
+        const productList = document.getElementById("productList");
+
+        function displayProducts(filteredProducts) {
+            productList.innerHTML = "";
+            filteredProducts.forEach(product => {
+                const item = document.createElement("div");
+                item.classList.add("card1");
+                item.innerHTML = `
+                    <img src="${product.img}" >
+                   
+                `;
+                product1.appendChild(item);
+            });
+        }
+
+        function displaySuggestions(filteredProducts) {
+            suggestionsBox.innerHTML = "";
+            if (filteredProducts.length === 0) {
+                suggestionsBox.style.display = "none";
+                return;
+            }
+            filteredProducts.forEach(product => {
+                const suggestion = document.createElement("div");
+                suggestion.classList.add("suggestion-item");
+                suggestion.textContent = product.name;
+                suggestion.addEventListener("click", () => {
+                    searchBox.value = product.name;
+                    filterProducts();
+                    suggestionsBox.style.display = "none";
+                });
+                suggestionsBox.appendChild(suggestion);
+            });
+            suggestionsBox.style.display = "block";
+        }
+
+        function filterProducts() {
+            const searchText = searchBox.value.toLowerCase();
+            const filteredProducts = products.filter(product =>
+                product.name.toLowerCase().includes(searchText)
+            );
+          
+            displaySuggestions(filteredProducts);
+        }
+
+        searchBox.addEventListener("input", filterProducts);
+        document.addEventListener("click", (e) => {
+            if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = "none";
+            }
+        });
+        // ✅ **Set Banner Products Dynamically**
+function loadBanners() {
+    products.forEach(product => {
+        let bannerDiv = document.createElement("div");
+        bannerDiv.classList.add("banner-card");
+        bannerDiv.style.background = `url('${product.bannerImg}') no-repeat center center/cover`;
+        bannerDiv.innerHTML = `<h1>${product.name} - Best Deal at ${product.price}</h1>`;
+        bannerSlider.appendChild(bannerDiv);
+    });
+}
+
+// ✅ **Load Categories Dynamically**
+function loadCategories() {
+    let categories = [...new Set(products.map(product => product.category))]; // Unique categories
+    categories.forEach(category => {
+        let categoryDiv = document.createElement("div");
+        categoryDiv.classList.add("category-card");
+        categoryDiv.innerText = category;
+        categoryContainer.appendChild(categoryDiv);
+    });
+}
+
+// **Initialize Page**
+loadBanners();
+loadCategories();
+
+
+    // Smooth Auto-slide banners (1-2-3-1-2-3 loop)
+    let currentIndex = 0;
+    const banners = document.querySelector(".banner-slider");
+    const bannerCards = document.querySelectorAll(".banner-card");
+
+    // Clone banners for seamless infinite effect
+    bannerCards.forEach(card => {
+        let clone = card.cloneNode(true);
+        banners.appendChild(clone);
+    });
+
+    function slideBanners() {
+        currentIndex++;
+        banners.style.transition = "transform 1.2s ease"; // Smoother
+        banners.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        // Reset animation when it reaches the last duplicate
+        if (currentIndex >= bannerCards.length) {
+            setTimeout(() => {
+                banners.style.transition = "none";
+                banners.style.transform = "translateX(0)";
+                currentIndex = 0;
+            }, 1200); // Matches transition duration
+        }
+    }
+
+    setInterval(slideBanners, 5000);
+  // Function to populate product cards
+  function populateProducts(container) {
+            products.forEach(product => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.price}</p>
+                `;
+                container.appendChild(card);
+            });
+        }function populateProducts(container) {
+            products.forEach(product => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.price}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Populate both Product 1 and Product 2 sections
+        populateProducts(product1Container);
+        populateProducts(product2Container);
+        populateProducts(product3Container);
+        
+
+        // Auto Slide every 3 seconds
+        let scrollAmount1 = 0;
+        let scrollAmount2 = 0;
+        let scrollAmount3 = 0;
+
+        function slideProducts(container, scrollAmount) {
+            if (scrollAmount < (container.scrollWidth - container.clientWidth)) {
+                scrollAmount += container.clientWidth;
+            } else {
+                scrollAmount = 0;
+            }
+            container.scrollTo({ left: scrollAmount, behavior: "smooth" });
+            return scrollAmount;
+        }
+
+        setInterval(() => {
+            scrollAmount1 = slideProducts(product1Container, scrollAmount1);
+            scrollAmount2 = slideProducts(product2Container, scrollAmount2);
+            scrollAmount3 = slideProducts(productContainer, scrollAmount3);
+           
+        }, 3000);
+        // Initial Load
+        displayProducts(products);
+      
+
+
+    </script>
+
+</body>
+</html>
