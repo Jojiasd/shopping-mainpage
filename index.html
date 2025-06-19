@@ -102,7 +102,35 @@
         }
         
     }
+card23 {
+     
+      padding: 0;
+      height: 100vh;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: 
+        radial-gradient(at 88% 40%, hsla(240, 85%, 39%, 1) 0px, transparent 85%),
+        radial-gradient(at 49% 30%, hsla(240, 85%, 39%, 1) 0px, transparent 85%),
+        radial-gradient(at 14% 26%, hsla(240, 85%, 39%, 1) 0px, transparent 85%),
+        radial-gradient(at 0% 64%, hsl(299, 99%, 26%) 0px, transparent 85%),
+        radial-gradient(at 41% 94%, hsl(299, 97%, 36%) 0px, transparent 85%),
+        radial-gradient(at 100% 99%, hsl(288, 94%, 13%) 0px, transparent 85%);
+      background-color: #0d0b1f;
+      background-attachment: fixed;
+      background-size: cover;
+      text-align: center;
+    }
 
+    .content23 {
+      backdrop-filter: blur(10px);
+      padding: 2rem 3rem;
+      border-radius: 1rem;
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
     /* Category Cards */
     .category-container {
         height:100%;
@@ -312,6 +340,13 @@
 </head>
 <body>
 
+    
+<card23>
+  <div class="content23">
+    <h1>Welcome to the Cosmos</h1>
+    <p>Crafted with gradients, powered by vision.</p>
+  </div>
+</card>
     <h2>Search Products</h2>
     <div class="search-container">
         <input type="text" id="searchBox" class="search-box" placeholder="Search Products...">
